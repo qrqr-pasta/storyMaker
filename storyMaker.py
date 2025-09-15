@@ -49,6 +49,9 @@ st.markdown("""
         padding: 1.5rem;
         margin: 1rem 0;
     }
+    .stSelectbox > div > div {
+        border-radius: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -109,6 +112,22 @@ with st.sidebar:
         st.session_state.characters = {'char1': char1, 'char2': char2}
         
         st.success("✅ 全要素をランダム生成しました！")
+    
+    # 個別ランダム選択
+    st.subheader("🎯 個別ランダム選択")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔀 中心状況", use_container_width=True):
+            st.session_state.elements['layer1A'] = random.choice(STORY_ELEMENTS['layer1A'])
+        if st.button("🔀 設定", use_container_width=True):
+            st.session_state.elements['layer2'] = random.choice(STORY_ELEMENTS['layer2'])
+    
+    with col2:
+        if st.button("🔀 劇的状況", use_container_width=True):
+            st.session_state.elements['layer1B'] = random.choice(STORY_ELEMENTS['layer1B'])
+        if st.button("🔀 装飾", use_container_width=True):
+            st.session_state.elements['layer3'] = random.choice(STORY_ELEMENTS['layer3'])
 
     st.divider()
     
@@ -120,7 +139,7 @@ with st.sidebar:
         ('layer3', '装飾・関係性')
     ]:
         if st.session_state.elements[layer]:
-            st.success(f"✅ {label}")
+            st.success(f"✅ {label}: {st.session_state.elements[layer]}")
         else:
             st.error(f"❌ {label}")
     
@@ -134,6 +153,14 @@ col1, col2 = st.columns([2, 1])
 
 with col1:
     st.header("🎯 物語要素選択")
+    
+    # 選択方法の切り替え
+    selection_mode = st.radio(
+        "選択方法",
+        ["individual", "random"],
+        format_func=lambda x: "🎯 個別選択（ドロップダウン）" if x == "individual" else "🎲 ランダム選択のみ",
+        horizontal=True
+    )
     
     # 4つの要素を2x2で配置
     row1_col1, row1_col2 = st.columns(2)
@@ -151,9 +178,33 @@ with col1:
         with columns[i]:
             st.subheader(label)
             
+            if selection_mode == "individual":
+                # ドロップダウンで選択
+                options = ["選択してください..."] + STORY_ELEMENTS[layer]
+                current_index = 0
+                if st.session_state.elements[layer]:
+                    try:
+                        current_index = options.index(st.session_state.elements[layer])
+                    except ValueError:
+                        current_index = 0
+                
+                selected = st.selectbox(
+                    "",
+                    options,
+                    index=current_index,
+                    key=f"select_{layer}"
+                )
+                
+                if selected != "選択してください...":
+                    st.session_state.elements[layer] = selected
+                elif selected == "選択してください..." and current_index != 0:
+                    st.session_state.elements[layer] = None
+            
+            # ランダム選択ボタン（どちらのモードでも表示）
             if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
                 st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
             
+            # 選択された要素を表示
             if st.session_state.elements[layer]:
                 st.markdown(f'<div class="element-box">{st.session_state.elements[layer]}</div>', unsafe_allow_html=True)
             else:
@@ -184,37 +235,84 @@ with col2:
             }
             st.session_state.characters = {'char1': char1, 'char2': char2}
     
-    if st.session_state.character_mode == "random" and st.session_state.characters:
-        char1 = st.session_state.characters['char1']
-        char2 = st.session_state.characters['char2']
+    if st.session_state.character_mode == "random":
+        # キャラクター詳細設定の選択肢
+        char_detail_mode = st.radio(
+            "キャラクター詳細設定",
+            ["auto", "manual"],
+            format_func=lambda x: "🎲 自動生成" if x == "auto" else "🎯 手動選択",
+            key="char_detail_mode"
+        )
         
-        st.markdown(f'''
-        <div class="character-box">
-        <strong>キャラクター1:</strong><br>
-        {char1['age']}・{char1['job']}・{char1['personality']}な性格
-        </div>
-        ''', unsafe_allow_html=True)
+        if char_detail_mode == "auto":
+            # 自動生成モード
+            if not st.session_state.characters:
+                char1 = {
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                char2 = {
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                st.session_state.characters = {'char1': char1, 'char2': char2}
+            
+            char1 = st.session_state.characters['char1']
+            char2 = st.session_state.characters['char2']
+            
+            st.markdown(f'''
+            <div class="character-box">
+            <strong>キャラクター1:</strong><br>
+            {char1['age']}・{char1['job']}・{char1['personality']}な性格
+            </div>
+            ''', unsafe_allow_html=True)
+            
+            st.markdown(f'''
+            <div class="character-box">
+            <strong>キャラクター2:</strong><br>
+            {char2['age']}・{char2['job']}・{char2['personality']}な性格
+            </div>
+            ''', unsafe_allow_html=True)
+            
+            if st.button("🔄 キャラクター再生成", use_container_width=True):
+                char1 = {
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                char2 = {
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                st.session_state.characters = {'char1': char1, 'char2': char2}
+                st.rerun()
         
-        st.markdown(f'''
-        <div class="character-box">
-        <strong>キャラクター2:</strong><br>
-        {char2['age']}・{char2['job']}・{char2['personality']}な性格
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        if st.button("🔄 キャラクター再生成", use_container_width=True):
-            char1 = {
-                'age': random.choice(AGES),
-                'job': random.choice(JOBS),
-                'personality': random.choice(PERSONALITIES)
+        else:
+            # 手動選択モード
+            st.subheader("キャラクター1")
+            char1_age = st.selectbox("年代", AGES, key="char1_age")
+            char1_job = st.selectbox("職業", JOBS, key="char1_job")
+            char1_personality = st.selectbox("性格", PERSONALITIES, key="char1_personality")
+            
+            st.subheader("キャラクター2")
+            char2_age = st.selectbox("年代", AGES, key="char2_age")
+            char2_job = st.selectbox("職業", JOBS, key="char2_job")
+            char2_personality = st.selectbox("性格", PERSONALITIES, key="char2_personality")
+            
+            st.session_state.characters = {
+                'char1': {'age': char1_age, 'job': char1_job, 'personality': char1_personality},
+                'char2': {'age': char2_age, 'job': char2_job, 'personality': char2_personality}
             }
-            char2 = {
-                'age': random.choice(AGES),
-                'job': random.choice(JOBS),
-                'personality': random.choice(PERSONALITIES)
-            }
-            st.session_state.characters = {'char1': char1, 'char2': char2}
-            st.rerun()
+            
+            st.markdown(f'''
+            <div class="character-box">
+            <strong>キャラクター1:</strong> {char1_age}・{char1_job}・{char1_personality}な性格<br>
+            <strong>キャラクター2:</strong> {char2_age}・{char2_job}・{char2_personality}な性格
+            </div>
+            ''', unsafe_allow_html=True)
     
     elif st.session_state.character_mode == "ai":
         st.markdown('''
