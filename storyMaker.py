@@ -292,4 +292,148 @@ with col2:
             
             if st.button("🔄 キャラクター再生成", use_container_width=True):
                 char1 = {
-                    'age': random.choice(AGES
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                char2 = {
+                    'age': random.choice(AGES),
+                    'job': random.choice(JOBS),
+                    'personality': random.choice(PERSONALITIES)
+                }
+                st.session_state.characters = {'char1': char1, 'char2': char2}
+                st.rerun()
+        
+        else:
+            # 手動選択モード
+            st.subheader("キャラクター1")
+            char1_age = st.selectbox("年代", AGES, key="char1_age")
+            char1_job = st.selectbox("職業", JOBS, key="char1_job")
+            char1_personality = st.selectbox("性格", PERSONALITIES, key="char1_personality")
+            
+            st.subheader("キャラクター2")
+            char2_age = st.selectbox("年代", AGES, key="char2_age")
+            char2_job = st.selectbox("職業", JOBS, key="char2_job")
+            char2_personality = st.selectbox("性格", PERSONALITIES, key="char2_personality")
+            
+            st.session_state.characters = {
+                'char1': {'age': char1_age, 'job': char1_job, 'personality': char1_personality},
+                'char2': {'age': char2_age, 'job': char2_job, 'personality': char2_personality}
+            }
+            
+            st.markdown(f'''
+            <div class="character-box">
+            <strong>キャラクター1:</strong> {char1_age}・{char1_job}・{char1_personality}な性格<br>
+            <strong>キャラクター2:</strong> {char2_age}・{char2_job}・{char2_personality}な性格
+            </div>
+            ''', unsafe_allow_html=True)
+    
+    elif st.session_state.character_mode == "ai":
+        st.markdown('''
+        <div class="character-box">
+        <strong>AIがシチュエーションに応じて選択</strong><br>
+        物語の要素に最適なキャラクターをAIが自動生成します
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    st.divider()
+    
+    st.subheader("💬 追加リクエスト（任意）")
+    user_request = st.text_area(
+        "",
+        placeholder="例：既存キャラクター「○○」を使用、特定の雰囲気にしたい、長さの指定など...",
+        height=100,
+        key="user_request"
+    )
+    
+    if user_request:
+        st.markdown(f'<div class="request-box"><strong>追加リクエスト:</strong><br>{user_request}</div>', unsafe_allow_html=True)
+
+# プロンプト生成
+st.divider()
+st.header("🎭 物語プロンプト生成")
+
+# 生成可能かチェック
+all_elements_selected = all(st.session_state.elements[layer] is not None for layer in st.session_state.elements)
+character_selected = st.session_state.character_mode is not None
+
+if st.button("📝 物語プロンプト生成", type="primary", disabled=not (all_elements_selected and character_selected), use_container_width=True):
+    # プロンプト生成
+    if st.session_state.character_mode == "random" and st.session_state.characters:
+        char1 = st.session_state.characters['char1']
+        char2 = st.session_state.characters['char2']
+        character_section = f"""## 登場人物設定
+**主要キャラクター1**: {char1['age']}・{char1['job']}・{char1['personality']}な性格
+**主要キャラクター2**: {char2['age']}・{char2['job']}・{char2['personality']}な性格"""
+    else:
+        character_section = """## 登場人物設定
+**指示**: 選択された物語要素に最も適した魅力的なキャラクター2人を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。"""
+    
+    request_section = ""
+    if user_request.strip():
+        request_section = f"\n\n## 追加リクエスト\n{user_request.strip()}"
+    
+    # 選ばれた要素のみをプロンプトに含める
+    elements_text = ""
+    element_count = 1
+    
+    if st.session_state.elements['layer1'] != "選ばない":
+        elements_text += f"{element_count}. **「{st.session_state.elements['layer1']}」** (第1層（劇的状況）)\n"
+        element_count += 1
+    
+    if st.session_state.elements['layer2'] != "選ばない":
+        elements_text += f"{element_count}. **「{st.session_state.elements['layer2']}」** (第2層（装飾・関係性）)\n"
+        element_count += 1
+    
+    # 全ての要素が「選ばない」の場合の処理
+    if elements_text == "":
+        elements_text = "**注意**: すべての要素が「選ばない」に設定されています。自由な発想で物語を創作してください。\n"
+        creation_instruction = "自由な発想で魅力的な短編小説を創作してください。"
+    else:
+        creation_instruction = "上記の物語要素をすべて含む短編小説を創作してください。"
+    
+    prompt = f"""# 短編物語創作依頼
+## 使用する物語要素
+{elements_text}
+{character_section}{request_section}
+
+## 創作指示
+{creation_instruction}
+- 各要素は自然に物語に組み込んでください
+- 文字数制限はありません（自然な長さで完結させてください）
+- 読者が引き込まれる魅力的な物語に仕上げてください
+- 意外性のある展開や結末を心がけてください
+
+## 改善プロンプト依頼
+物語作成後、以下を追加で提供してください：
+**「この作品をより良くするための改善プロンプト」**
+- 作品の良い点と改善すべき点を分析
+- 具体的な改善指示を含む新しいプロンプトを生成
+- そのプロンプトで再作成すれば、より魅力的な作品になるような内容で"""
+    
+    st.markdown('<div class="prompt-box">', unsafe_allow_html=True)
+    st.markdown("### 📋 生成されたプロンプト")
+    st.code(prompt, language="markdown")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # コピー用テキストエリア
+    st.text_area("コピー用（全選択してコピーしてください）", prompt, height=200)
+    
+    st.success("✅ プロンプトが生成されました！上記をコピーしてClaudeに送信してください。")
+
+if not (all_elements_selected and character_selected):
+    missing_items = []
+    if not all_elements_selected:
+        missing_items.append("物語要素")
+    if not character_selected:
+        missing_items.append("キャラクター設定")
+    
+    st.warning(f"⚠️ {' と '.join(missing_items)}を選択してください。")
+
+# フッター
+st.divider()
+st.markdown("""
+<div style="text-align: center; color: #666; margin-top: 2rem;">
+    📚 物語創作システム - Claude × Streamlit版
+</div>
+""", unsafe_allow_html=True)
