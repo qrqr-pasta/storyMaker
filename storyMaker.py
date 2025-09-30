@@ -179,14 +179,6 @@ with st.sidebar:
 # メインコンテンツ
 st.header("🎯 物語要素選択")
 
-# 選択方法の切り替え
-selection_mode = st.radio(
-    "選択方法",
-    ["individual", "random"],
-    format_func=lambda x: "🎯 個別選択（ドロップダウン）" if x == "individual" else "🎲 ランダム選択のみ",
-    horizontal=True
-)
-
 # 2つの要素を1x2で配置
 row1_col1, row1_col2 = st.columns(2)
 
@@ -200,29 +192,28 @@ for i, (layer, label) in enumerate(layers):
     with columns[i]:
         st.subheader(label)
         
-        if selection_mode == "individual":
-            # ドロップダウンで選択
-            options = ["選択してください..."] + ["選ばない"] + STORY_ELEMENTS[layer]
-            current_index = 0
-            if st.session_state.elements[layer]:
-                try:
-                    current_index = options.index(st.session_state.elements[layer])
-                except ValueError:
-                    current_index = 0
-            
-            selected = st.selectbox(
-                "",
-                options,
-                index=current_index,
-                key=f"select_{layer}"
-            )
-            
-            if selected != "選択してください...":
-                st.session_state.elements[layer] = selected
-            elif selected == "選択してください..." and current_index != 0:
-                st.session_state.elements[layer] = None
+        # ドロップダウンで選択
+        options = ["選択してください..."] + ["選ばない"] + STORY_ELEMENTS[layer]
+        current_index = 0
+        if st.session_state.elements[layer]:
+            try:
+                current_index = options.index(st.session_state.elements[layer])
+            except ValueError:
+                current_index = 0
         
-        # ランダム選択ボタン（どちらのモードでも表示）
+        selected = st.selectbox(
+            "",
+            options,
+            index=current_index,
+            key=f"select_{layer}"
+        )
+        
+        if selected != "選択してください...":
+            st.session_state.elements[layer] = selected
+        elif selected == "選択してください..." and current_index != 0:
+            st.session_state.elements[layer] = None
+        
+        # ランダム選択ボタン（常に表示）
         if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
             st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
             st.rerun()
