@@ -192,6 +192,11 @@ for i, (layer, label) in enumerate(layers):
     with columns[i]:
         st.subheader(label)
         
+        # ランダム選択ボタン（上に配置）
+        if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
+            st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
+            st.rerun()
+        
         # ドロップダウンで選択
         options = ["選択してください..."] + ["選ばない"] + STORY_ELEMENTS[layer]
         current_index = 0
@@ -212,11 +217,6 @@ for i, (layer, label) in enumerate(layers):
             st.session_state.elements[layer] = selected
         elif selected == "選択してください..." and current_index != 0:
             st.session_state.elements[layer] = None
-        
-        # ランダム選択ボタン（常に表示）
-        if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
-            st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
-            st.rerun()
         
         # 選択された要素を表示
         if st.session_state.elements[layer]:
