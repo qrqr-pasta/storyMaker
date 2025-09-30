@@ -21,21 +21,12 @@ st.markdown("""
     .element-box {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 1rem;
+        padding: 1.5rem;
         border-radius: 10px;
         text-align: center;
         font-weight: bold;
-        margin: 0.5rem 0;
-    }
-    .element-box-none {
-        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 10px;
-        text-align: center;
-        font-weight: bold;
-        margin: 0.5rem 0;
-        font-style: italic;
+        margin: 1rem 0;
+        font-size: 1.2rem;
     }
     .request-box {
         background: linear-gradient(135deg, #a8e6cf 0%, #81c784 100%);
@@ -51,15 +42,12 @@ st.markdown("""
         padding: 1.5rem;
         margin: 1rem 0;
     }
-    .stSelectbox > div > div {
-        border-radius: 10px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# 物語要素データ（リファイン版）
+# 物語要素データ
 STORY_ELEMENTS = {
-    # Layer1: 物語の基本構造（プロット・アーキタイプ）
+    # Layer1: 物語の基本構造（プロット・アークタイプ）
     "layer1": [
         # 探索・発見系
         "失われたものを探す旅", "禁じられた場所への侵入", "隠された真実の発見",
@@ -108,7 +96,7 @@ STORY_ELEMENTS = {
         "真夜中の虹", "満月の夜", "血の色の雪",
         
         # 動物・生き物
-        "片翼の鳥", "二度鳴く烏", "白い獣", "導く蝶",
+        "片翼の鳥", "二度鳴く鳥", "白い獣", "導く蝶",
         "不吉な黒猫", "人語を話す魚", "影の犬",
         
         # 音・音楽
@@ -126,109 +114,67 @@ STORY_ELEMENTS = {
 }
 
 # セッション状態の初期化
-if 'elements' not in st.session_state:
-    st.session_state.elements = {
-        'layer1': None,
-        'layer2': None
-    }
+if 'layer1' not in st.session_state:
+    st.session_state.layer1 = None
+if 'layer2' not in st.session_state:
+    st.session_state.layer2 = None
 
 # ヘッダー
 st.markdown('<h1 class="main-header">📚 物語創作システム</h1>', unsafe_allow_html=True)
 
 # サイドバー
 with st.sidebar:
-    st.header("🎲 クイック操作")
+    st.header("🎲 ランダム生成")
     
     if st.button("すべてランダム生成", type="primary", use_container_width=True):
-        # 全要素をランダム選択（「選ばない」は含まない）
-        for layer in STORY_ELEMENTS:
-            st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
-        
-        st.success("✅ 全要素をランダム生成しました!")
+        st.session_state.layer1 = random.choice(STORY_ELEMENTS['layer1'])
+        st.session_state.layer2 = random.choice(STORY_ELEMENTS['layer2'])
+        st.success("✅ 全要素を生成しました!")
         st.rerun()
     
-    # 個別ランダム選択
-    st.subheader("🎯 個別ランダム選択")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔀 劇的状況", use_container_width=True):
-            st.session_state.elements['layer1'] = random.choice(STORY_ELEMENTS['layer1'])
-            st.rerun()
-    
-    with col2:
-        if st.button("🔀 装飾・関係性", use_container_width=True):
-            st.session_state.elements['layer2'] = random.choice(STORY_ELEMENTS['layer2'])
-            st.rerun()
-
     st.divider()
     
     st.header("📊 選択状況")
-    for layer, label in [
-        ('layer1', '劇的状況'),
-        ('layer2', '装飾・関係性')
-    ]:
-        if st.session_state.elements[layer]:
-            if st.session_state.elements[layer] == "選ばない":
-                st.info(f"⚪ {label}: {st.session_state.elements[layer]}")
-            else:
-                st.success(f"✅ {label}: {st.session_state.elements[layer]}")
-        else:
-            st.error(f"❌ {label}")
+    if st.session_state.layer1:
+        st.success(f"✅ 劇的状況:\n{st.session_state.layer1}")
+    else:
+        st.error("❌ 劇的状況: 未選択")
+    
+    if st.session_state.layer2:
+        st.success(f"✅ 装飾・関係性:\n{st.session_state.layer2}")
+    else:
+        st.error("❌ 装飾・関係性: 未選択")
 
 # メインコンテンツ
 st.header("🎯 物語要素選択")
 
-# 2つの要素を1x2で配置
-row1_col1, row1_col2 = st.columns(2)
+col1, col2 = st.columns(2)
 
-columns = [row1_col1, row1_col2]
-layers = [
-    ('layer1', '第1層（劇的状況）'),
-    ('layer2', '第2層（装飾・関係性）')
-]
+# 第1層（劇的状況）
+with col1:
+    st.subheader("第1層（劇的状況）")
+    
+    if st.button("🎯 ランダム選択", key="random_layer1", use_container_width=True):
+        st.session_state.layer1 = random.choice(STORY_ELEMENTS['layer1'])
+        st.rerun()
+    
+    if st.session_state.layer1:
+        st.markdown(f'<div class="element-box">{st.session_state.layer1}</div>', unsafe_allow_html=True)
+    else:
+        st.info("「ランダム選択」ボタンを押してください")
 
-for i, (layer, label) in enumerate(layers):
-    with columns[i]:
-        st.subheader(label)
-        
-        # ランダム選択ボタン（上に配置）
-        if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
-            st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
-            st.rerun()
-        
-        # ドロップダウンで選択
-        options = ["選択してください..."] + ["選ばない"] + STORY_ELEMENTS[layer]
-        current_index = 0
-        if st.session_state.elements[layer]:
-            try:
-                current_index = options.index(st.session_state.elements[layer])
-            except ValueError:
-                current_index = 0
-        
-        def on_change():
-            selected = st.session_state[f"select_{layer}"]
-            if selected != "選択してください...":
-                st.session_state.elements[layer] = selected
-            else:
-                st.session_state.elements[layer] = None
-        
-        selected = st.selectbox(
-            "",
-            options,
-            index=current_index,
-            key=f"select_{layer}",
-            on_change=on_change
-        )
-        
-        # 選択された要素を表示
-        if st.session_state.elements[layer]:
-            if st.session_state.elements[layer] == "選ばない":
-                st.markdown(f'<div class="element-box-none">この要素は使用しない</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="element-box">{st.session_state.elements[layer]}</div>', unsafe_allow_html=True)
-        else:
-            st.info("要素を選択してください")
+# 第2層（装飾・関係性）
+with col2:
+    st.subheader("第2層（装飾・関係性）")
+    
+    if st.button("🎯 ランダム選択", key="random_layer2", use_container_width=True):
+        st.session_state.layer2 = random.choice(STORY_ELEMENTS['layer2'])
+        st.rerun()
+    
+    if st.session_state.layer2:
+        st.markdown(f'<div class="element-box">{st.session_state.layer2}</div>', unsafe_allow_html=True)
+    else:
+        st.info("「ランダム選択」ボタンを押してください")
 
 # 追加リクエストセクション
 st.divider()
@@ -247,33 +193,16 @@ if user_request:
 st.divider()
 st.header("🎭 物語プロンプト生成")
 
-# 生成可能かチェック
-all_elements_selected = all(st.session_state.elements[layer] is not None for layer in st.session_state.elements)
+all_elements_selected = st.session_state.layer1 and st.session_state.layer2
 
 if st.button("📝 物語プロンプト生成", type="primary", disabled=not all_elements_selected, use_container_width=True):
-    # プロンプト生成
     request_section = ""
     if user_request.strip():
         request_section = f"\n\n## 追加リクエスト\n{user_request.strip()}"
     
-    # 選ばれた要素のみをプロンプトに含める
-    elements_text = ""
-    element_count = 1
-    
-    if st.session_state.elements['layer1'] != "選ばない":
-        elements_text += f"{element_count}. **「{st.session_state.elements['layer1']}」** (第1層（劇的状況）)\n"
-        element_count += 1
-    
-    if st.session_state.elements['layer2'] != "選ばない":
-        elements_text += f"{element_count}. **「{st.session_state.elements['layer2']}」** (第2層（装飾・関係性）)\n"
-        element_count += 1
-    
-    # 全ての要素が「選ばない」の場合の処理
-    if elements_text == "":
-        elements_text = "**注意**: すべての要素が「選ばない」に設定されています。自由な発想で物語を創作してください。\n"
-        creation_instruction = "自由な発想で魅力的な短編小説を創作してください。"
-    else:
-        creation_instruction = "上記の物語要素をすべて含む短編小説を創作してください。"
+    elements_text = f"""1. **「{st.session_state.layer1}」** (第1層（劇的状況）)
+2. **「{st.session_state.layer2}」** (第2層（装飾・関係性）)
+"""
     
     prompt = f"""# 短編物語創作依頼
 
@@ -283,7 +212,7 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
 **指示**: 選択された物語要素に最も適した魅力的なキャラクター（1人以上）を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。{request_section}
 
 ## 創作指示
-{creation_instruction}
+上記の物語要素をすべて含む短編小説を創作してください。
 - 各要素は自然に物語に組み込んでください
 - 文字数制限はありません（自然な長さで完結させてください）
 - 読者が引き込まれる魅力的な物語に仕上げてください
@@ -301,13 +230,12 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
     st.code(prompt, language="markdown")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # コピー用テキストエリア
     st.text_area("コピー用（全選択してコピーしてください）", prompt, height=200)
     
     st.success("✅ プロンプトが生成されました！上記をコピーしてClaudeに送信してください。")
 
 if not all_elements_selected:
-    st.warning(f"⚠️ 物語要素を選択してください。")
+    st.warning("⚠️ 両方の物語要素を選択してください。")
 
 # フッター
 st.divider()
