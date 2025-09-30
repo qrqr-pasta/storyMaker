@@ -145,6 +145,7 @@ with st.sidebar:
             st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
         
         st.success("✅ 全要素をランダム生成しました!")
+        st.rerun()
     
     # 個別ランダム選択
     st.subheader("🎯 個別ランダム選択")
@@ -153,10 +154,12 @@ with st.sidebar:
     with col1:
         if st.button("🔀 劇的状況", use_container_width=True):
             st.session_state.elements['layer1'] = random.choice(STORY_ELEMENTS['layer1'])
+            st.rerun()
     
     with col2:
         if st.button("🔀 装飾・関係性", use_container_width=True):
             st.session_state.elements['layer2'] = random.choice(STORY_ELEMENTS['layer2'])
+            st.rerun()
 
     st.divider()
     
@@ -222,6 +225,7 @@ for i, (layer, label) in enumerate(layers):
         # ランダム選択ボタン（どちらのモードでも表示）
         if st.button(f"🎯 ランダム選択", key=f"random_{layer}", use_container_width=True):
             st.session_state.elements[layer] = random.choice(STORY_ELEMENTS[layer])
+            st.rerun()
         
         # 選択された要素を表示
         if st.session_state.elements[layer]:
