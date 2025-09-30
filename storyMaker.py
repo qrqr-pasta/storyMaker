@@ -206,17 +206,20 @@ for i, (layer, label) in enumerate(layers):
             except ValueError:
                 current_index = 0
         
+        def on_change():
+            selected = st.session_state[f"select_{layer}"]
+            if selected != "選択してください...":
+                st.session_state.elements[layer] = selected
+            else:
+                st.session_state.elements[layer] = None
+        
         selected = st.selectbox(
             "",
             options,
             index=current_index,
-            key=f"select_{layer}"
+            key=f"select_{layer}",
+            on_change=on_change
         )
-        
-        if selected != "選択してください...":
-            st.session_state.elements[layer] = selected
-        elif selected == "選択してください..." and current_index != 0:
-            st.session_state.elements[layer] = None
         
         # 選択された要素を表示
         if st.session_state.elements[layer]:
