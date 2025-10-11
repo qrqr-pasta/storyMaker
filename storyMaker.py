@@ -3,7 +3,7 @@ import random
 
 # ページ設定
 st.set_page_config(
-    page_title="物語創作システム",
+    page_title="物語創作システム v2",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -18,7 +18,7 @@ st.markdown("""
         font-size: 2.5rem;
         margin-bottom: 2rem;
     }
-    .element-box {
+    .trope-box {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 1.5rem;
@@ -27,6 +27,7 @@ st.markdown("""
         font-weight: bold;
         margin: 1rem 0;
         font-size: 1.2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .request-box {
         background: linear-gradient(135deg, #a8e6cf 0%, #81c784 100%);
@@ -42,137 +43,182 @@ st.markdown("""
         padding: 1.5rem;
         margin: 1rem 0;
     }
+    .info-badge {
+        display: inline-block;
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        margin: 0.2rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# 物語要素データ
-STORY_ELEMENTS = {
-    # Layer1: 物語の基本構造（プロット・アークタイプ）
-    "layer1": [
-        # 探索・発見系
-        "失われたものを探す旅", "禁じられた場所への侵入", "隠された真実の発見",
-        "忘れられた過去の発掘", "未知の世界への冒険", "謎の解明",
-        
-        # 対立・葛藤系
-        "復讐の連鎖", "裏切りと報復", "善と悪の対決", "権力への反逆",
-        "不可能への挑戦", "運命との戦い", "時間制限のある危機",
-        
-        # 変容・成長系
-        "無名から英雄へ", "堕落と redemption", "アイデンティティの喪失と再構築",
-        "師との別れと独り立ち", "罪と赦し", "絶望からの再生",
-        
-        # 関係性の変化
-        "禁断の愛", "失った人との再会", "敵から味方へ", "信頼の崩壊",
-        "世代を超えた対話", "運命的な出会い",
-        
-        # 犠牲と選択
-        "大切なものとの別れ", "究極の選択", "誰かのための犠牲",
-        "守るべきものの喪失", "取り返しのつかない決断",
-        
-        # その他
-        "入れ替わる人生", "繰り返される悪夢", "予言の成就", "因果応報"
-    ],
+# 物語要素データ - 中間トロープ
+STORY_TROPES = [
+    # 状況・シチュエーション系
+    "24時間以内に起きる出来事",
+    "一つの場所から出られない状況",
+    "誰かが眠り続けている",
+    "全員が同じ夢を見る",
+    "記憶が毎日リセットされる",
+    "誰も信じてくれない真実",
+    "二つの世界を行き来する",
+    "時間が逆行している",
+    "言葉が通じない相手との対話",
+    "誰かになりすまさなければならない",
     
-    # Layer2: テクスチャを与える小道具（象徴・モチーフ）
-    "layer2": [
-        # 記憶・記録を繋ぐもの
-        "色褪せた手紙", "破れた日記", "古い写真", "録音テープ",
-        "血で書かれた遺言", "暗号化された地図", "消えかけの刺繍",
-        
-        # 時間を象徴するもの
-        "止まった時計", "砂時計", "朽ちた暦", "季節外れの花",
-        "風化した墓標", "錆びた鍵",
-        
-        # 約束・契約の象徴
-        "割れた指輪", "半分のペンダント", "対の剣", "結ばれた赤い糸",
-        "封印された契約書", "欠けた勲章",
-        
-        # 身体・生命に関わるもの
-        "消えない傷跡", "失われた記憶", "奪われた声", "見えない目",
-        "凍った涙", "流れない血", "震える手",
-        
-        # 自然現象・天候
-        "降り続く雨", "止まない雷鳴", "消えない霧", "永遠の夕暮れ",
-        "真夜中の虹", "満月の夜", "血の色の雪",
-        
-        # 動物・生き物
-        "片翼の鳥", "二度鳴く鳥", "白い獣", "導く蝶",
-        "不吉な黒猫", "人語を話す魚", "影の犬",
-        
-        # 音・音楽
-        "聞こえない旋律", "不協和音", "子守唄", "鐘の音",
-        "壊れたオルゴール", "最後の歌声",
-        
-        # 場所・空間
-        "閉ざされた扉", "壊れた橋", "枯れた井戸", "忘れられた庭",
-        "境界線", "鏡の向こう", "夢と現実の狭間",
-        
-        # 抽象概念の具現化
-        "影の取引", "嘘の代償", "沈黙の誓い", "呪われた才能",
-        "盗まれた名前", "売られた魂", "失われた笑顔"
-    ]
-}
+    # 制約・ルール系
+    "特定の言葉を口にできない",
+    "触れてはいけない存在",
+    "日没までに終わらせるべきこと",
+    "三つの選択肢しかない",
+    "一度だけ使える力",
+    "誰かの死と引き換えの願い",
+    "嘘をつくと代償を払う",
+    "見られてはいけない姿",
+    "一人でいてはいけない理由",
+    "同じことを繰り返す運命",
+    
+    # 関係性の動態系
+    "互いの正体を隠している二人",
+    "一方的に記憶されている関係",
+    "敵同士が協力せざるを得ない",
+    "保護者と被保護者の逆転",
+    "血縁の嘘",
+    "師弟関係の終焉",
+    "代理として生きる人生",
+    "監視する者と監視される者",
+    "依存と支配の境界",
+    "世代を超えた約束の継承",
+    
+    # 能力・条件系
+    "他人の感情が分かってしまう",
+    "未来が断片的に見える",
+    "死者の声が聞こえる",
+    "特定の人物だけに見える存在",
+    "感情を失った代わりに得たもの",
+    "誰かの代わりに苦痛を受ける",
+    "真実を見抜く目",
+    "触れたものの過去が分かる",
+    "一つだけ時間を戻せる力",
+    "他人の人生を体験する夢",
+    
+    # 場所・空間の性質系
+    "時間の流れが異なる場所",
+    "入るたびに変化する空間",
+    "現実と幻想の境界が曖昧な場所",
+    "過去の記憶が再現される場所",
+    "禁忌を破った者だけが見える世界",
+    "生者と死者が交わる場所",
+    "二つの時代が重なる地点",
+    "真実だけが響く部屋",
+    "感情が具現化する空間",
+    "全ての終わりが始まる場所",
+    
+    # 心理・認識系
+    "自分が本物か分からない",
+    "他人の記憶を持っている",
+    "二つの人格の共存",
+    "過去の自分と対峙する",
+    "自分の死を予知している",
+    "他人から見た自分を知る",
+    "現実と虚構の区別がつかない",
+    "重要な何かを忘れている確信",
+    "誰かの記憶の中で生きている",
+    "存在しなかったことにされた人生",
+    
+    # 時間・タイミング系
+    "運命の分岐点への回帰",
+    "あと一度だけ会える機会",
+    "過去が変更された現在",
+    "決められた順序でしか起きない出来事",
+    "誰かの時間を奪って生きる",
+    "特定の瞬間だけ発動する力",
+    "過去の選択のやり直し",
+    "未来の自分からのメッセージ",
+    "時間制限付きの命",
+    "永遠に繰り返される一日"
+]
 
 # セッション状態の初期化
-if 'layer1' not in st.session_state:
-    st.session_state.layer1 = None
-if 'layer2' not in st.session_state:
-    st.session_state.layer2 = None
+if 'trope1' not in st.session_state:
+    st.session_state.trope1 = None
+if 'trope2' not in st.session_state:
+    st.session_state.trope2 = None
 
 # ヘッダー
-st.markdown('<h1 class="main-header">📚 物語創作システム</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">📚 物語創作システム v2</h1>', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; color: #666; margin-bottom: 2rem;">🎲 意外性を生む中間トロープの組み合わせ</div>', unsafe_allow_html=True)
 
 # サイドバー
 with st.sidebar:
     st.header("🎲 ランダム生成")
     
-    if st.button("すべてランダム生成", type="primary", use_container_width=True):
-        st.session_state.layer1 = random.choice(STORY_ELEMENTS['layer1'])
-        st.session_state.layer2 = random.choice(STORY_ELEMENTS['layer2'])
-        st.success("✅ 全要素を生成しました!")
+    if st.button("2つのトロープを生成", type="primary", use_container_width=True):
+        # 重複しないように2つ選択
+        selected = random.sample(STORY_TROPES, 2)
+        st.session_state.trope1 = selected[0]
+        st.session_state.trope2 = selected[1]
+        st.success("✅ トロープを生成しました!")
         st.rerun()
     
     st.divider()
     
     st.header("📊 選択状況")
-    if st.session_state.layer1:
-        st.success(f"✅ 劇的状況:\n{st.session_state.layer1}")
+    if st.session_state.trope1:
+        st.success(f"✅ トロープ1:\n{st.session_state.trope1}")
     else:
-        st.error("❌ 劇的状況: 未選択")
+        st.error("❌ トロープ1: 未選択")
     
-    if st.session_state.layer2:
-        st.success(f"✅ 装飾・関係性:\n{st.session_state.layer2}")
+    if st.session_state.trope2:
+        st.success(f"✅ トロープ2:\n{st.session_state.trope2}")
     else:
-        st.error("❌ 装飾・関係性: 未選択")
+        st.error("❌ トロープ2: 未選択")
+    
+    st.divider()
+    
+    st.markdown("""
+    <div style="font-size: 0.85rem; color: #666;">
+    <strong>💡 ヒント</strong><br>
+    中間トロープの組み合わせで、<br>
+    予測不可能な物語が生まれます
+    </div>
+    """, unsafe_allow_html=True)
 
 # メインコンテンツ
-st.header("🎯 物語要素選択")
+st.header("🎯 トロープ選択")
 
 col1, col2 = st.columns(2)
 
-# 第1層（劇的状況）
+# トロープ1
 with col1:
-    st.subheader("第1層（劇的状況）")
+    st.subheader("トロープ 1")
     
-    if st.button("🎯 ランダム選択", key="random_layer1", use_container_width=True):
-        st.session_state.layer1 = random.choice(STORY_ELEMENTS['layer1'])
+    if st.button("🎯 ランダム選択", key="random_trope1", use_container_width=True):
+        # トロープ2と重複しないように選択
+        available = [t for t in STORY_TROPES if t != st.session_state.trope2]
+        st.session_state.trope1 = random.choice(available)
         st.rerun()
     
-    if st.session_state.layer1:
-        st.markdown(f'<div class="element-box">{st.session_state.layer1}</div>', unsafe_allow_html=True)
+    if st.session_state.trope1:
+        st.markdown(f'<div class="trope-box">{st.session_state.trope1}</div>', unsafe_allow_html=True)
     else:
         st.info("「ランダム選択」ボタンを押してください")
 
-# 第2層（装飾・関係性）
+# トロープ2
 with col2:
-    st.subheader("第2層（装飾・関係性）")
+    st.subheader("トロープ 2")
     
-    if st.button("🎯 ランダム選択", key="random_layer2", use_container_width=True):
-        st.session_state.layer2 = random.choice(STORY_ELEMENTS['layer2'])
+    if st.button("🎯 ランダム選択", key="random_trope2", use_container_width=True):
+        # トロープ1と重複しないように選択
+        available = [t for t in STORY_TROPES if t != st.session_state.trope1]
+        st.session_state.trope2 = random.choice(available)
         st.rerun()
     
-    if st.session_state.layer2:
-        st.markdown(f'<div class="element-box">{st.session_state.layer2}</div>', unsafe_allow_html=True)
+    if st.session_state.trope2:
+        st.markdown(f'<div class="trope-box">{st.session_state.trope2}</div>', unsafe_allow_html=True)
     else:
         st.info("「ランダム選択」ボタンを押してください")
 
@@ -193,27 +239,28 @@ if user_request:
 st.divider()
 st.header("🎭 物語プロンプト生成")
 
-all_elements_selected = st.session_state.layer1 and st.session_state.layer2
+all_tropes_selected = st.session_state.trope1 and st.session_state.trope2
 
-if st.button("📝 物語プロンプト生成", type="primary", disabled=not all_elements_selected, use_container_width=True):
+if st.button("📝 物語プロンプト生成", type="primary", disabled=not all_tropes_selected, use_container_width=True):
     request_section = ""
     if user_request.strip():
         request_section = f"\n\n## 追加リクエスト\n{user_request.strip()}"
     
-    elements_text = f"""1. **「{st.session_state.layer1}」** (第1層（劇的状況）)
-2. **「{st.session_state.layer2}」** (第2層（装飾・関係性）)
+    tropes_text = f"""1. **「{st.session_state.trope1}」**
+2. **「{st.session_state.trope2}」**
 """
     
     prompt = f"""# 短編物語創作依頼
 
-## 使用する物語要素
-{elements_text}
+## 使用するトロープ（物語要素）
+{tropes_text}
 ## 登場人物設定
-**指示**: 選択された物語要素に最も適した魅力的なキャラクター（1人以上）を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。{request_section}
+**指示**: 選択されたトロープに最も適した魅力的なキャラクター（1人以上）を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。{request_section}
 
 ## 創作指示
-上記の物語要素をすべて含む短編小説を創作してください。
-- 各要素は自然に物語に組み込んでください
+上記の2つのトロープを自然に組み合わせた短編小説を創作してください。
+- 両方のトロープが物語に有機的に統合されているようにしてください
+- トロープ同士の意外な組み合わせから生まれる独創性を活かしてください
 - 文字数制限はありません（自然な長さで完結させてください）
 - 読者が引き込まれる魅力的な物語に仕上げてください
 - 意外性のある展開や結末を心がけてください
@@ -233,14 +280,19 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
     st.text_area("コピー用（全選択してコピーしてください）", prompt, height=200)
     
     st.success("✅ プロンプトが生成されました！上記をコピーしてClaudeに送信してください。")
+    
+    # トロープの組み合わせ情報
+    st.info(f"🎲 **今回の組み合わせ**: 「{st.session_state.trope1}」×「{st.session_state.trope2}」")
 
-if not all_elements_selected:
-    st.warning("⚠️ 両方の物語要素を選択してください。")
+if not all_tropes_selected:
+    st.warning("⚠️ 2つのトロープを選択してください。")
 
 # フッター
 st.divider()
-st.markdown("""
+st.markdown(f"""
 <div style="text-align: center; color: #666; margin-top: 2rem;">
-    📚 物語創作システム - Claude × Streamlit版
+    📚 物語創作システム v2 - 中間トロープ組み合わせ版<br>
+    <span class="info-badge">トロープ総数: {len(STORY_TROPES)}個</span>
+    <span class="info-badge">可能な組み合わせ: {len(STORY_TROPES) * (len(STORY_TROPES) - 1) // 2}通り</span>
 </div>
 """, unsafe_allow_html=True)
