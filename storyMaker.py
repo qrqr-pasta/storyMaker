@@ -362,7 +362,7 @@ if 'trope2' not in st.session_state:
     st.session_state.trope2 = None
 
 # ヘッダー
-st.markdown('<h1 class="main-header">📚 物語創作システム v2</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">📚 物語創作システム v2.1</h1>', unsafe_allow_html=True)
 st.markdown('<div style="text-align: center; color: #666; margin-bottom: 2rem;">🎲 意外性を生む中間トロープの組み合わせ</div>', unsafe_allow_html=True)
 
 # サイドバー
@@ -504,7 +504,7 @@ if not all_tropes_selected:
 st.divider()
 st.markdown(f"""
 <div style="text-align: center; color: #666; margin-top: 2rem;">
-    📚 物語創作システム v2 - 中間トロープ組み合わせ版<br>
+    📚 物語創作システム v2.1 - 中間トロープ組み合わせ版<br>
     <span class="info-badge">トロープ総数: {len(STORY_TROPES)}個</span>
     <span class="info-badge">可能な組み合わせ: {len(STORY_TROPES) * (len(STORY_TROPES) - 1) // 2}通り</span>
 </div>
