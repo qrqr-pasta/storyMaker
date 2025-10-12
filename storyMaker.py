@@ -3,7 +3,7 @@ import random
 
 # ページ設定
 st.set_page_config(
-    page_title="物語創作システム v2",
+    page_title="物語創作システム v3",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded"
