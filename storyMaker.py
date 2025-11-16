@@ -5,7 +5,7 @@ import random
 st.set_page_config(
     page_title="物語創作システム v3",
     page_icon="📚",
-    layout="wide",
+    layout="centered",  # モバイル対応のため変更
     initial_sidebar_state="expanded"
 )
 
@@ -242,6 +242,27 @@ if 'trope2' not in st.session_state:
 st.markdown('<h1 class="main-header">📚 物語創作システム v3</h1>', unsafe_allow_html=True)
 st.markdown('<div style="text-align: center; color: #666; margin-bottom: 2rem;">🎲 4層トロープ統合版 - 類型・上位・中間・下位すべてをフラットに選択</div>', unsafe_allow_html=True)
 
+# 使い方の説明
+with st.expander("💡 使い方", expanded=False):
+    st.markdown("""
+    ### このツールの使い方
+    
+    1. **トロープを選択**: 左サイドバーまたは画面中央のボタンで2つのトロープをランダム選択
+    2. **追加リクエスト（任意）**: 特定のキャラクター、雰囲気、長さなどを指定できます
+    3. **プロンプト生成**: 「物語プロンプト生成」ボタンを押す
+    4. **Claudeに送信**: 生成されたプロンプトをコピーして、[claude.ai](https://claude.ai)に貼り付ける
+    5. **物語を受け取る**: Claudeが短編小説を創作します
+    
+    #### トロープとは？
+    物語の「型」や「要素」のことです。このツールは145個のトロープから2つをランダムに組み合わせ、
+    意外性のある物語の種を作ります。
+    
+    #### 注意事項
+    - このツールはプロンプト（指示文）を生成するだけです
+    - 実際の物語生成にはClaude（AI）が必要です
+    - Claude.aiは無料でも使用できます
+    """)
+
 # サイドバー
 with st.sidebar:
     st.header("🎲 ランダム生成")
@@ -341,7 +362,7 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
 ## 使用するトロープ(物語要素)
 {tropes_text}
 ## 登場人物設定
-**指示**: 選択されたトロープに最も適した魅力的なキャラクター(1人以上)を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。固有名詞は重複を避けるために一般的でない名前にしてください。特に”美咲”は頻出する傾向なので、禁止します。{request_section}
+**指示**: 選択されたトロープに最も適した魅力的なキャラクター(1人以上)を、AIが自由に設定してください。年代、職業、性格などを物語のテーマに合わせて選択し、読者が感情移入しやすいキャラクターを作成してください。登場人物の固有名刺は重複を避けるために一般的でない特徴的な名前にしてください。特に「美咲」は頻出する傾向なので、禁止します。{request_section}
 
 ## 創作指示
 上記の2つのトロープを自然に組み合わせた短編小説を創作してください。
@@ -366,6 +387,38 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
 if not all_tropes_selected:
     st.warning("⚠️ 2つのトロープを選択してください。")
 
+# 利用規約・免責事項
+st.divider()
+with st.expander("📜 利用規約・免責事項"):
+    st.markdown("""
+    ### 利用規約
+    
+    **1. このツールについて**
+    - このツールは物語創作のためのプロンプト生成ツールです
+    - 生成されたプロンプトをClaude（Anthropic社のAI）に送信することで物語が作成されます
+    - このツール自体はAIを使用せず、プロンプトのテンプレートを提供するのみです
+    
+    **2. 著作権について**
+    - 生成されたプロンプト：自由に使用・改変できます
+    - AI生成された物語：Anthropic社の利用規約に従います
+    - 商業利用をする場合は、[Anthropic社の利用規約](https://www.anthropic.com/legal/consumer-terms)を必ずご確認ください
+    
+    **3. 免責事項**
+    - 生成される内容について、開発者は一切の責任を負いません
+    - 不適切な内容が生成された場合、使用者の責任で対処してください
+    - Claudeのコンテンツポリシーに違反する使用はおやめください
+    - このツールの使用により生じたいかなる損害についても、開発者は責任を負いません
+    
+    **4. データの取り扱い**
+    - このアプリはユーザーデータを一切保存しません
+    - セッション終了後、すべての情報は自動的に削除されます
+    - 外部サーバーへのデータ送信は行いません
+    
+    **5. その他**
+    - このツールは予告なく変更・終了する場合があります
+    - 本規約は予告なく変更される場合があります
+    """)
+
 # フッター
 st.divider()
 st.markdown(f"""
@@ -376,5 +429,13 @@ st.markdown(f"""
     <span class="info-badge">上位対立: 10個</span>
     <span class="info-badge">中間設定: 100個</span>
     <span class="info-badge">小道具: 20個</span>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div style="text-align: center; color: #666; margin-top: 1rem; font-size: 0.85rem;">
+    ⚠️ 生成された物語を商業利用する場合は、
+    <a href="https://www.anthropic.com/legal/consumer-terms" target="_blank">Anthropicの利用規約</a>
+    をご確認ください
 </div>
 """, unsafe_allow_html=True)
