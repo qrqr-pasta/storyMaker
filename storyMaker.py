@@ -737,7 +737,8 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
 ## 使用するトロープ(物語要素)
 {tropes_text}
 - 1000字以内。場面は少なく。
-- 最初は本文を出さず、あらすじだけ7個出してください。"""
+- 最初は本文を出さず、あらすじだけ7個出してください。
+- 本文の最後に、使用したトロープ２個を書いて下さい。"""
     
     st.markdown('<div class="prompt-box">', unsafe_allow_html=True)
     st.markdown("### 📋 生成されたプロンプト")
