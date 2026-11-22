@@ -739,7 +739,7 @@ if st.button("📝 物語プロンプト生成", type="primary", disabled=not al
 - 1000字以内。場面は少なく。
 - 最初は本文を出さず、あらすじだけ10個出してください。
 - あらすじはバリエーションのふり幅を大きくしてください。
-- 本文の最後に、使用したトロープ２個を書いて下さい。"""
+- 本文の最後に、使用したトロープ２個を書いて下さい。{request_section}"""
     
     st.markdown('<div class="prompt-box">', unsafe_allow_html=True)
     st.markdown("### 📋 生成されたプロンプト")
